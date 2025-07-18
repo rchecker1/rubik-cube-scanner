@@ -123,10 +123,10 @@ def scan_single_face():
         
         # show different message if captured
         if captured:
-            cv2.putText(frame, f"CAPTURED: {''.join(face_colors)} - press ENTER to confirm", 
+            cv2.putText(frame, f"Captured: {''.join(face_colors)} - press ENTER to confirm", 
                        (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
         else:
-            cv2.putText(frame, "position cube face in grid, space to capture", 
+            cv2.putText(frame, "Position the cube face in the grid, orientaton matters, space to capture", 
                        (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
         
         cv2.putText(frame, "q to quit", 
@@ -229,14 +229,14 @@ def convert_solution_to_readable(solution_string):
     turn default sv codes to readable
     """
     
-    # face mappings with colors
+    #map faces to colors
     face_names = {
-        'L': 'LEFT/GREEN',
-        'D': 'DOWN/YELLOW', 
-        'B': 'BACK/ORANGE',
-        'R': 'RIGHT/BLUE',
-        'U': 'UP/WHITE',
-        'F': 'FRONT/RED'  
+        'L': 'GREEN/LEFT',
+        'D': 'YELLOW/DOWN', 
+        'B': 'ORANGE/BACK',
+        'R': 'BLUE/RIGHT',
+        'U': 'WHITE/UP',
+        'F': 'RED/FRONT'  
     }
     
     # direction mappings
