@@ -25,31 +25,27 @@ def detect_color(bgr_color):
     hsv = cv2.cvtColor(np.uint8([[[b, g, r]]]), cv2.COLOR_BGR2HSV)[0][0]
     h, s, v = hsv
     
-    # white is bright and not very colorful
     if v > 160 and s < 60:
         return 'W'
     
-    # yellow hue around 25-35
+    #*yellow hue --> 25-35*
     elif 22 <= h <= 38 and s > 80 and v > 100:
         return 'Y'
     
-    # orange is between red and yellow
+    #orange color calibrated to webcam
     elif 5 <= h <= 30 and s > 80:
         return 'O'
     
-    # red wraps around the hue circle, must calibrate
     elif (h <= 8 or h >= 170) and s > 90:
         return 'R'
     
-    # green is color usually around here
     elif 45 <= h <= 75 and s > 70:
         return 'G'
     
-    # blue 
     elif 100 <= h <= 125 and s > 70:
         return 'B'
     
-    # backup plan if hsv does not work
+    """
     else:
         if r > g + 30 and r > b + 30:
             return 'R'
@@ -61,7 +57,7 @@ def detect_color(bgr_color):
             return 'W'
         else:
             return 'Y'  # when in doubt
-
+"""
 def identify_face_by_center(face_colors):
     if not face_colors or len(face_colors) != 9:
         return None
@@ -69,23 +65,26 @@ def identify_face_by_center(face_colors):
     center_color = face_colors[4]  # center square
     
     face_mapping = {
-        'W': 'TOP',
-        'G': 'LEFT',
-        'R': 'FRONT',
-        'Y': 'BOTTOM',
-        'B': 'RIGHT',
-        'O': 'BACK'
+        'W': 'top',
+        'G': 'left',
+        'R': 'front',
+        'Y': 'bottom',
+        'B': 'right',
+        'O': 'back'
     }
     
-    return face_mapping.get(center_color, 'UNKNOWN')
+    return face_mapping.get(center_color, 'unknown??')
 
 def scan_single_face():
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     
     if not cap.isOpened():
-        print("camera not working")
+        print("cam not found")
         return None
-    
+
+
+
+
     face_colors = []
     captured = False
     
@@ -95,8 +94,6 @@ def scan_single_face():
             break
             
         height, width = frame.shape[:2]
-        
-        # setup 3x3 grid
         grid_size = 300
         start_x = width // 2 - grid_size // 2
         start_y = height - grid_size - 30
@@ -121,12 +118,11 @@ def scan_single_face():
                 cv2.putText(frame, color, (center_x - 10, center_y + 5), 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
         
-        # show different message if captured
         if captured:
-            cv2.putText(frame, f"Captured: {''.join(face_colors)} - press ENTER to confirm", 
+            cv2.putText(frame, f"Captured: {''.join(face_colors)} - press enter to confirm", 
                        (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
         else:
-            cv2.putText(frame, "Position the cube face in the grid, orientaton matters, space to capture", 
+            cv2.putText(frame, "space = capture", 
                        (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
         
         cv2.putText(frame, "q to quit", 
@@ -134,12 +130,12 @@ def scan_single_face():
         
         cv2.imshow('cube scanner', frame)
         
-        key = cv2.waitKey(30) & 0xFF
+        key = cv2.waitKey(30)
         if key == ord(' ') and not captured:
             face_colors = colors.copy()
             captured = True
             print(f"captured: {''.join(colors)}")
-        elif key == ord('\r') and captured:  # enter key
+        elif key == ord('\r') and captured:
             break
         elif key == ord('q'):
             face_colors = None
@@ -149,11 +145,11 @@ def scan_single_face():
     cv2.destroyAllWindows()
     return face_colors
 
-def flexible_cube_scanner():
+def dynamic_cube_scanner():
     print("cube scanner starting")
     
     all_faces = {}
-    required_faces = ['TOP', 'RIGHT', 'FRONT', 'BOTTOM', 'LEFT', 'BACK']
+    required_faces = ['top', 'right', 'front', 'bottom', 'left', 'back']
     
     face_count = 0
     
@@ -201,7 +197,7 @@ def flexible_cube_scanner():
     print("\nall faces scanned")
     
     # build the string in right order
-    ordered_faces = ['TOP', 'RIGHT', 'FRONT', 'BOTTOM', 'LEFT', 'BACK']
+    ordered_faces = ['top', 'right', 'front', 'bottom', 'left', 'back']
     cube_string = ""
     
     for face_name in ordered_faces:
@@ -231,12 +227,12 @@ def convert_solution_to_readable(solution_string):
     
     #map faces to colors
     face_names = {
-        'L': 'GREEN/LEFT',
-        'D': 'YELLOW/DOWN', 
-        'B': 'ORANGE/BACK',
-        'R': 'BLUE/RIGHT',
-        'U': 'WHITE/UP',
-        'F': 'RED/FRONT'  
+        'L': 'green/left',
+        'D': 'yellow/down', 
+        'B': 'orange/back',
+        'R': 'blue/right',
+        'U': 'white/up',
+        'F': 'red/front'  
     }
     
     # direction mappings
@@ -280,4 +276,4 @@ def print_readable_solution(solution):
     print(f"Total moves: {len(readable)}")
     print("-:"*50)
 
-flexible_cube_scanner()
+dynamic_cube_scanner()
